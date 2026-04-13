@@ -1,3 +1,4 @@
+/*
 import java.io.File;
 import java.util.HashMap;
 import java.util.Scanner;
@@ -38,8 +39,8 @@ public class Testfile {
 
     }
 }
-
-class Car{
+/*
+class {
     String brand;
     int year;
 
@@ -52,3 +53,4 @@ class Car{
         System.out.println("year:"+year);
     }
 }
+*/

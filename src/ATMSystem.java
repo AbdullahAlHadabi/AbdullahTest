@@ -22,7 +22,7 @@
                 balance -= amount;
                 System.out.println("Withdrawn " + amount);
             } else {
-                System.out.println("No balance !!");
+                System.out.println("No amount !!");
             }
         }
 
