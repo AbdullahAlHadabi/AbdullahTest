@@ -20,7 +20,7 @@ class Car extends Vehicle {
         super(speed, fuel);
     }
 
-    public void fast() {
+    public void move() {
         System.out.println(" car is speed "+speed+ "  And use fuel type : " +fuel );
     }
 }
@@ -31,7 +31,7 @@ class Plane extends Vehicle {
         super(speed, fuel);
     }
 
-    public void fly() {
+    public void move() {
         System.out.println("Plane is flying and speed is :" + speed + " using fuel type : " + fuel);
     }
 }
@@ -44,10 +44,10 @@ public class Game {
         Plane plane = new Plane(900, 500);
 
         car.move();   // inherited
-        car.fast();   // own method
+        car.move();   // own method
 
         plane.move(); // inherited
-        plane.fly();  // own method
+        plane.move();  // own method
     }
 }
 
