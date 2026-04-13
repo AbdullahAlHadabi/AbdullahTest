@@ -20,6 +20,7 @@ class Car extends Vehicle {
         super(speed, fuel);
     }
 
+    // Override Method : is same name method but different action
     public void move() {
         System.out.println(" car is speed "+speed+ "  And use fuel type : " +fuel );
     }
