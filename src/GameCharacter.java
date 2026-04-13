@@ -64,8 +64,8 @@ public class GameCharacter {
 
         @Override
         public void attack(Character target) {
-            int damage = 20;
-            stamina -= 5;
+            int damage = 20;  // Warrior attack power
+            stamina -= 5; // Every attack reduces stamina
             System.out.println(name + " swings sword ");
             target.takeDamage(damage);
         }
