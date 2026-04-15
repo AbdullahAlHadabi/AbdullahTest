@@ -48,22 +48,34 @@ public class OOPTesting {
 
                     System.out.println("Top student: " + top.name);
                 }
-
             } else {
-                break;
+                if (choice == 4) {
+                    if (students.size() > 0) {
+                        Student lowest = students.get(0);
+                        for (Student s : students) {
+                            if (s.score < lowest.score) {
+                                lowest = s;
+                            }
+                        }
+                        System.out.println("Lowest student: " + lowest.name + " - " + lowest.score);
+                    }
+                    ;
+                }
             }
         }
     }
 }
 
+
 class Student {
     String name;
     int score;
-
-
-
-
 }
+
+
+
+
+
 
 
 
