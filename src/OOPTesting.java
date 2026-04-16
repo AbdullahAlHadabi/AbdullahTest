@@ -1,12 +1,13 @@
 import java.util.ArrayList;
 import java.util.Scanner;
 
+
 public class OOPTesting {
     public static void main(String[] args) {
 
-
         ArrayList<Student> students = new ArrayList<>();
         Scanner input = new Scanner(System.in);
+
 
         while (true) {
             System.out.println("1. Add Student");
@@ -28,15 +29,9 @@ public class OOPTesting {
                 input.nextLine();
 
 
-                Student s = new Student();
-                s.name = name;
-                s.score = score;
-
-                students.add(s);
-
             } else if (choice == 2) {
                 for (Student s : students) {
-                    System.out.println(s.name + " - " + s.score);
+                    System.out.println(s.getName() + " - " + s.getName());
                 }
 
             } else if (choice == 3) {
@@ -44,23 +39,23 @@ public class OOPTesting {
                     Student top = students.get(0); //For now I will assume the FIRST student is the best
 
                     for (Student s : students) {
-                        if (s.score > top.score) {
+                        if (s.getScore() > top.getScore()) {
                             top = s; // for updating the top student
                         }
                     }
 
-                    System.out.println("Top student: " + top.name + " --- The score :  " + top.score);
+                    System.out.println("Top student: " + top.getName() + " --- The score :  " + top.getScore());
                 }
             } else {
                 if (choice == 4) {
                     if (!students.isEmpty()) {
                         Student lowest = students.get(0);
                         for (Student s : students) {
-                            if (s.score < lowest.score) {
+                            if (s.getScore() < lowest.getScore()) {
                                 lowest = s;
                             }
                         }
-                        System.out.println("Lowest student: " + lowest.name + " - " + lowest.score);
+                        System.out.println("Lowest student: " + lowest.getName() + " - " + lowest.getName());
                     }
 
                 } else if (choice == 5) {
@@ -71,8 +66,8 @@ public class OOPTesting {
                     boolean found = false;
 
                     for (Student s : students) {
-                        if (s.name.equals(searchName)) {
-                            System.out.println("Found: " + s.name + " - " + s.score);
+                        if (s.getName().equals(searchName)) {
+                            System.out.println("Found: " + s.getName() + " - " + s.getName());
                             found = true;
                             break;
                         }
@@ -97,8 +92,30 @@ public class OOPTesting {
 
 
 class Student {
-    String name;
-    int score;
+     private String  name;
+     int  score;
+
+     public Student(String name, int score) {
+         this.name = name;
+         this.score = score;
+     }
+
+     public String getName() {
+
+         return name;
+     }
+     public int getScore() {
+
+         return score;
+     }
+
+     public void setScore(int score) {
+         if (score < 0 && score > 100) {
+             this.score = score;
+         }else {
+             System.out.println("Invalid score");
+         }
+     }
 }
 
 
