@@ -4,7 +4,9 @@ import java.util.Scanner;
 
 public class PhoneProject {
     public static void main(String[] args) {
-        HashMap<String, String> contacts = new HashMap<>();
+
+        ArrayList<Contact> contactsList = new ArrayList<>();
+        HashMap<String, Contact> contacts = new HashMap<>();
         Scanner sc = new Scanner(System.in);
 
         while (true) {
@@ -24,8 +26,12 @@ public class PhoneProject {
                 System.out.println("Enter Contact Number:");
                 String number = sc.nextLine();
 
-                contacts.put(name, number);
-                System.out.println("Contact added successfully!");
+
+                Contact c = new Contact(name, number);
+
+                contacts.put(name, c);
+                contactsList.add(c);
+                System.out.println("Contact added successfully :) ");
             }
 
             // here we search for contact
@@ -34,7 +40,8 @@ public class PhoneProject {
                 String name = sc.nextLine();
 
                 if(contacts.containsKey(name)) {
-                    System.out.println("Number : " + contacts.get(name));
+                    Contact c = contacts.get(name);
+                    System.out.println("Found: " + c.name + " - " + c.number);
                 }else  {
                     System.out.println("Contact does not found");
                 }
@@ -42,29 +49,49 @@ public class PhoneProject {
             //delete contact
             else if (choice == 3) {
                 System.out.println("Enter Contact Name to Delete: ");
-                String name = sc.nextLine();
+                String name = sc.nextLine().toLowerCase();
 
-                if(contacts.containsKey(name)) {
+                if (contacts.containsKey(name)) {
                     contacts.remove(name);
                     System.out.println("Contact deleted successfully :) ");
-                }else {}
+                } else {
                     System.out.println("Contact does not found");
                 }
-            else if (choice == 4) {
-                System.out.println("All Contacts:");
-                for (String name : contacts.keySet()) {
-                    System.out.println("Name: " + name + ", Number: " + contacts.get(name));
-                }
-            } else if (choice == 5) {
-                System.out.println("Exiting...");
-                break;
-            } else {
-                System.out.println("Invalid choice. Please try again.");
-            }
-       }
 
+                // Show All SORTED
+            }else if (choice == 4) {
+
+                    if (contactsList.isEmpty()) {
+                        System.out.println("No contacts.");
+                        continue;
+                    }
+
+                    contactsList.sort((c1, c2) -> c1.name.compareTo(c2.name));
+
+                    for (Contact c : contactsList) {
+                        System.out.println(c.name + " - " + c.number);
+                    }
+                }
+
+                // 🔹 Exit
+                else if (choice == 5) {
+                    System.out.println("Goodbye see you soon :) ");
+                    break;
+                }
+
+                else {
+                    System.out.println("Invalid choice.");
+                }
+            }
+        }
+    }
+ class Contact {
+    String name;
+    String number;
+    public Contact(String name, String number) {
+        this.name = name;
+        this.number = number;
     }
 }
-
 
 
