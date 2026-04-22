@@ -73,7 +73,7 @@ public class PhoneProject {
                     }
                 }
 
-                // 🔹 Exit
+                //  Exit
                 else if (choice == 5) {
                     System.out.println("Goodbye see you soon :) ");
                     break;
