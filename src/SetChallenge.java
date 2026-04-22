@@ -18,6 +18,9 @@ public class SetChallenge {
         List<String> sortedCountries = new ArrayList<>(Country);
         Collections.sort(sortedCountries);
         System.out.println("Here we sort them : "+ sortedCountries);
+        for(String country : sortedCountries){
+            System.out.println(country);
+        }
 
 
     }
