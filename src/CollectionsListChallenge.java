@@ -21,7 +21,5 @@ public class CollectionsListChallenge {
         list.sort(Collections.reverseOrder());//Reverse Order
         System.out.println(list+ " The list after sorting");
 
-
-
     }
 }
