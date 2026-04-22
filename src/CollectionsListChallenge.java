@@ -17,6 +17,9 @@ public class CollectionsListChallenge {
         System.out.println(list.contains("Abdullah"));
         Collections.sort(list);
         System.out.println(list+ " The list after sorting"); // sorting the names in order  - Alphabetical sort
+        System.out.println(list.get(0)); // get the first name in the list
+        list.sort(Collections.reverseOrder());//Reverse Order
+        System.out.println(list+ " The list after sorting");
 
 
 
