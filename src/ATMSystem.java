@@ -7,6 +7,9 @@
             this.balance = balance;
         }
 
+        public Account(int balance, String abdullah, double v) {
+        }
+
 
         public void Deposit(double amount) {
             if (amount < 0) {
