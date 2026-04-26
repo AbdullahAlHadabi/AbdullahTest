@@ -1,7 +1,7 @@
 public class OOPRecap {
     public static void main(String[] args) {
 
-        BankAccount account = new BankAccount();
+        SimpleBankAccount account = new SimpleBankAccount();
         account.deposit(500);
         account.withdraw(100);
         System.out.println("Balance: " + account.getBalance());
@@ -10,23 +10,23 @@ public class OOPRecap {
     }
 }
 
-class BankAccount {
-    private int blance;
+class SimpleBankAccount {
+    private int balance;
 
 
     void deposit(int amount){
-        blance += amount;
+        balance += amount;
     }
     void withdraw(int amount){
-        blance -= amount;
+        balance -= amount;
     }
 
     public int getBalance(){
-        return blance;
+        return balance;
     }
 
     public int setBalance(int amount){
-        blance -= amount;
-        return blance;
+        balance -= amount;
+        return balance;
     }
 }
