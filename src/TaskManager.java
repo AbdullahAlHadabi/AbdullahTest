@@ -2,6 +2,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.io.*;
 
 public class TaskManager {
     private static ArrayList<Task> tasks = new ArrayList<>();
@@ -12,8 +13,13 @@ public class TaskManager {
         System.out.println("=== Advanced Task Manager ===");
         System.out.println("Built with OOP Principles\n");
 
-        // Add some sample tasks
-        initializeSampleTasks();
+        // Load tasks from file
+        loadTasksFromFile();
+
+        // Add some sample tasks only if no tasks were loaded
+        if (tasks.isEmpty()) {
+            initializeSampleTasks();
+        }
 
         boolean running = true;
         while (running) {
@@ -43,6 +49,8 @@ public class TaskManager {
                     displayStatistics();
                     break;
                 case 8:
+                    // Save tasks to file before exiting
+                    saveTasksToFile();
                     System.out.println("Thank you for using Task Manager!");
                     running = false;
                     break;
@@ -270,6 +278,64 @@ public class TaskManager {
             }
         }
     }
+
+    private static void saveTasksToFile() {
+        try (PrintWriter writer = new PrintWriter(new FileWriter("tasks.txt"))) {
+            for (Task task : tasks) {
+                writer.println(task.getId() + "," +
+                             task.getTitle() + "," +
+                             task.getDescription() + "," +
+                             task.getPriority() + "," +
+                             task.getCategory() + "," +
+                             task.isCompleted() + "," +
+                             task.getCreatedDate().toString() + "," +
+                             (task.getCompletedDate() != null ? task.getCompletedDate().toString() : "null"));
+            }
+            System.out.println("Tasks saved to file successfully!");
+        } catch (IOException e) {
+            System.out.println("Error saving tasks to file: " + e.getMessage());
+        }
+    }
+
+    private static void loadTasksFromFile() {
+        try (BufferedReader reader = new BufferedReader(new FileReader("tasks.txt"))) {
+            String line;
+            tasks.clear();
+            taskIdCounter = 1;
+
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",");
+                if (parts.length >= 8) {
+                    int id = Integer.parseInt(parts[0]);
+                    String title = parts[1];
+                    String description = parts[2];
+                    Priority priority = Priority.valueOf(parts[3]);
+                    Category category = Category.valueOf(parts[4]);
+                    boolean completed = Boolean.parseBoolean(parts[5]);
+                    LocalDateTime createdDate = LocalDateTime.parse(parts[6]);
+                    LocalDateTime completedDate = parts[7].equals("null") ? null : LocalDateTime.parse(parts[7]);
+
+                    Task task = new Task(title, description, priority, category);
+                    task.setId(id);
+                    if (completed) {
+                        task.setCompleted(true);
+                        task.setCompletedDate(completedDate);
+                    }
+                    task.setCreatedDate(createdDate);
+
+                    tasks.add(task);
+                    if (id >= taskIdCounter) {
+                        taskIdCounter = id + 1;
+                    }
+                }
+            }
+            System.out.println("Tasks loaded from file successfully!");
+        } catch (FileNotFoundException e) {
+            System.out.println("No saved tasks file found. Starting with empty task list.");
+        } catch (IOException e) {
+            System.out.println("Error loading tasks from file: " + e.getMessage());
+        }
+    }
 }
 
 // Task class demonstrating encapsulation
@@ -321,6 +387,10 @@ class Task {
     public boolean isCompleted() { return completed; }
     public LocalDateTime getCreatedDate() { return createdDate; }
     public LocalDateTime getCompletedDate() { return completedDate; }
+    public void setId(int id) { this.id = id; }
+    public void setCompleted(boolean completed) { this.completed = completed; }
+    public void setCompletedDate(LocalDateTime completedDate) { this.completedDate = completedDate; }
+    public void setCreatedDate(LocalDateTime createdDate) { this.createdDate = createdDate; }
 }
 
 // Enums for type safety
