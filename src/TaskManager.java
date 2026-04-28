@@ -209,13 +209,28 @@ public class TaskManager {
             try {
                 System.out.print(prompt);
                 int value = Integer.parseInt(scanner.nextLine());
-                if (value >= 1 && value <= 4) { // Adjust based on context
-                    return value;
-                } else {
-                    System.out.println("Please enter a number between 1 and 4.");
-                }
+                return value;
             } catch (NumberFormatException e) {
                 System.out.println("Please enter a valid integer.");
+            }
+        }
+    }
+
+    private static String getStringInput(String prompt) {
+        System.out.print(prompt);
+        return scanner.nextLine().trim();
+    }
+
+    private static boolean getBooleanInput(String prompt) {
+        while (true) {
+            System.out.print(prompt + " (y/n): ");
+            String input = scanner.nextLine().toLowerCase().trim();
+            if (input.equals("y") || input.equals("yes")) {
+                return true;
+            } else if (input.equals("n") || input.equals("no")) {
+                return false;
+            } else {
+                System.out.println("Please enter 'y' for yes or 'n' for no.");
             }
         }
     }
