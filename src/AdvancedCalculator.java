@@ -5,6 +5,7 @@ import java.util.Stack;
 public class AdvancedCalculator {
     private static Scanner scanner = new Scanner(System.in);
     private static ArrayList<String> history = new ArrayList<>();
+    private static double memory = 0;
 
     public static void main(String[] args) {
         System.out.println("=== Advanced Calculator ===");
@@ -23,12 +24,15 @@ public class AdvancedCalculator {
                     performScientificCalculation();
                     break;
                 case 3:
-                    viewHistory();
+                    performMemoryFunctions();
                     break;
                 case 4:
-                    clearHistory();
+                    viewHistory();
                     break;
                 case 5:
+                    clearHistory();
+                    break;
+                case 6:
                     System.out.println("Thank you for using Advanced Calculator!");
                     running = false;
                     break;
@@ -43,10 +47,12 @@ public class AdvancedCalculator {
         System.out.println("\n=== Calculator Menu ===");
         System.out.println("1. Basic Calculations (+, -, *, /)");
         System.out.println("2. Scientific Calculations (sin, cos, tan, log, sqrt)");
-        System.out.println("3. View Calculation History");
-        System.out.println("4. Clear History");
-        System.out.println("5. Exit");
+        System.out.println("3. Memory Functions (Store, Recall, Clear)");
+        System.out.println("4. View Calculation History");
+        System.out.println("5. Clear History");
+        System.out.println("6. Exit");
         System.out.println("========================");
+        System.out.println("Memory: " + memory);
     }
 
     private static void performBasicCalculation() {
@@ -159,6 +165,32 @@ public class AdvancedCalculator {
         System.out.println("Result: " + result);
         String calculation = function + " = " + result;
         history.add(calculation);
+    }
+
+    private static void performMemoryFunctions() {
+        System.out.println("\n=== Memory Functions ===");
+        System.out.println("Current memory: " + memory);
+        System.out.println("1. Store value in memory");
+        System.out.println("2. Recall value from memory");
+        System.out.println("3. Clear memory");
+
+        int choice = getIntInput("Select memory function: ");
+        switch (choice) {
+            case 1:
+                double valueToStore = getDoubleInput("Enter value to store in memory: ");
+                memory = valueToStore;
+                System.out.println("Value stored in memory.");
+                break;
+            case 2:
+                System.out.println("Recalled value from memory: " + memory);
+                break;
+            case 3:
+                memory = 0;
+                System.out.println("Memory cleared.");
+                break;
+            default:
+                System.out.println("Invalid choice!");
+        }
     }
 
     private static void viewHistory() {
