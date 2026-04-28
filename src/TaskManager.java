@@ -37,9 +37,12 @@ public class TaskManager {
                     searchTasks();
                     break;
                 case 6:
-                    displayStatistics();
+                    sortTasks();
                     break;
                 case 7:
+                    displayStatistics();
+                    break;
+                case 8:
                     System.out.println("Thank you for using Task Manager!");
                     running = false;
                     break;
@@ -57,8 +60,9 @@ public class TaskManager {
         System.out.println("3. Mark Task Complete");
         System.out.println("4. Delete Task");
         System.out.println("5. Search Tasks");
-        System.out.println("6. Display Statistics");
-        System.out.println("7. Exit");
+        System.out.println("6. Sort Tasks");
+        System.out.println("7. Display Statistics");
+        System.out.println("8. Exit");
         System.out.println("=========================");
     }
 
@@ -161,6 +165,38 @@ public class TaskManager {
 
         if (!found) {
             System.out.println("No tasks found matching: " + searchTerm);
+        }
+    }
+
+    private static void sortTasks() {
+        System.out.println("\n=== Sort Tasks ===");
+        System.out.println("Sort by:");
+        System.out.println("1. Priority (High to Low)");
+        System.out.println("2. Category");
+        System.out.println("3. Status (Pending first)");
+        System.out.println("4. Creation Date (Newest first)");
+
+        int choice = getIntInput("Enter sort option: ");
+
+        switch (choice) {
+            case 1:
+                tasks.sort((t1, t2) -> t2.getPriority().compareTo(t1.getPriority()));
+                System.out.println("Tasks sorted by priority!");
+                break;
+            case 2:
+                tasks.sort((t1, t2) -> t1.getCategory().compareTo(t2.getCategory()));
+                System.out.println("Tasks sorted by category!");
+                break;
+            case 3:
+                tasks.sort((t1, t2) -> Boolean.compare(t1.isCompleted(), t2.isCompleted()));
+                System.out.println("Tasks sorted by status!");
+                break;
+            case 4:
+                tasks.sort((t1, t2) -> t2.getCreatedDate().compareTo(t1.getCreatedDate()));
+                System.out.println("Tasks sorted by creation date!");
+                break;
+            default:
+                System.out.println("Invalid choice.");
         }
     }
 
