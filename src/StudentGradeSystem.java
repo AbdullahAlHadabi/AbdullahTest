@@ -3,9 +3,9 @@ import java.util.Scanner;
 import java.io.*;
 
 public class StudentGradeSystem {
-    private static ArrayList<Student> students = new ArrayList<>();
+    private static ArrayList<Scholar> students = new ArrayList<>();
     private static Scanner scanner = new Scanner(System.in);
-    private static int studentIdCounter = 1;
+    static int studentIdCounter = 1;
 
     public static void main(String[] args) {
         System.out.println("=== Student Grade Management System ===");
@@ -70,7 +70,7 @@ public class StudentGradeSystem {
         System.out.print("Enter student email: ");
         String email = scanner.nextLine();
 
-        Student student = new Student(name, email);
+        Scholar student = new Scholar(name, email);
         students.add(student);
         System.out.println("Student added successfully! ID: " + student.getId());
     }
@@ -82,7 +82,7 @@ public class StudentGradeSystem {
             return;
         }
 
-        for (Student student : students) {
+        for (Scholar student : students) {
             System.out.println("ID: " + student.getId() + " | Name: " + student.getName() +
                              " | Email: " + student.getEmail() + " | GPA: " + String.format("%.2f", student.calculateGPA()));
         }
@@ -93,7 +93,7 @@ public class StudentGradeSystem {
         System.out.print("Enter student ID: ");
         int studentId = getIntInput("");
 
-        Student student = findStudentById(studentId);
+        Scholar student = findStudentById(studentId);
         if (student == null) {
             System.out.println("Student not found.");
             return;
@@ -118,7 +118,7 @@ public class StudentGradeSystem {
         System.out.print("Enter student ID: ");
         int studentId = getIntInput("");
 
-        Student student = findStudentById(studentId);
+        Scholar student = findStudentById(studentId);
         if (student == null) {
             System.out.println("Student not found.");
             return;
@@ -132,7 +132,7 @@ public class StudentGradeSystem {
         System.out.print("Enter student ID: ");
         int studentId = getIntInput("");
 
-        Student student = findStudentById(studentId);
+        Scholar student = findStudentById(studentId);
         if (student == null) {
             System.out.println("Student not found.");
             return;
@@ -158,7 +158,7 @@ public class StudentGradeSystem {
         int averageCount = 0;   // GPA >= 2.0
         int poorCount = 0;      // GPA < 2.0
 
-        for (Student student : students) {
+        for (Scholar student : students) {
             double gpa = student.calculateGPA();
             classAverage += gpa;
 
@@ -179,8 +179,8 @@ public class StudentGradeSystem {
         System.out.println("Poor (D/F, <2.0): " + poorCount + " students");
     }
 
-    private static Student findStudentById(int id) {
-        for (Student student : students) {
+    private static Scholar findStudentById(int id) {
+        for (Scholar student : students) {
             if (student.getId() == id) {
                 return student;
             }
@@ -190,7 +190,7 @@ public class StudentGradeSystem {
 
     private static void saveStudentsToFile() {
         try (PrintWriter writer = new PrintWriter(new FileWriter("students.txt"))) {
-            for (Student student : students) {
+            for (Scholar student : students) {
                 writer.println(student.getId() + "," + student.getName() + "," + student.getEmail());
                 // Save grades
                 for (Grade grade : student.getGrades()) {
@@ -206,7 +206,7 @@ public class StudentGradeSystem {
     private static void loadStudentsFromFile() {
         try (BufferedReader reader = new BufferedReader(new FileReader("students.txt"))) {
             String line;
-            Student currentStudent = null;
+            Scholar currentStudent = null;
 
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",");
@@ -216,7 +216,7 @@ public class StudentGradeSystem {
                     String name = parts[1];
                     String email = parts[2];
 
-                    currentStudent = new Student(name, email);
+                    currentStudent = new Scholar(name, email);
                     currentStudent.setId(id);
                     students.add(currentStudent);
 
@@ -263,14 +263,14 @@ public class StudentGradeSystem {
     }
 }
 
-// Student class demonstrating encapsulation
-class Student {
+// Scholar class demonstrating encapsulation
+class Scholar {
     private int id;
     private String name;
     private String email;
     private ArrayList<Grade> grades;
 
-    public Student(String name, String email) {
+    public Scholar(String name, String email) {
         this.id = StudentGradeSystem.studentIdCounter++;
         this.name = name;
         this.email = email;
