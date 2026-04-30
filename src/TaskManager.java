@@ -7,7 +7,7 @@ import java.io.*;
 public class TaskManager {
     private static ArrayList<Task> tasks = new ArrayList<>();
     private static Scanner scanner = new Scanner(System.in);
-    private static int taskIdCounter = 1;
+    static int taskIdCounter = 1;
 
     public static void main(String[] args) {
         System.out.println("=== Advanced Task Manager ===");
