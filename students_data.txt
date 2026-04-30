@@ -1,0 +1,5 @@
+Name,Age,Major,GPA,Email,Type,Advisor,ResearchArea,Semester
+John Doe,20,Computer Science,3.5,john@email.com,Undergraduate,,,Spring 2024
+Jane Smith,19,Engineering,3.8,jane@email.com,Undergraduate,,,Fall 2024
+Bob Johnson,25,Data Science,3.9,bob@email.com,Graduate,Dr. Smith,Machine Learning,
+Alice Brown,24,AI Research,4.0,alice@email.com,Graduate,Dr. Davis,Neural Networks,
