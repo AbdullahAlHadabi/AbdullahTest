@@ -5,10 +5,10 @@ import java.time.format.DateTimeFormatter;
 import java.io.*;
 
 public class BankAccountSimulator {
-    private static ArrayList<Account> accounts = new ArrayList<>();
-    private static ArrayList<Transaction> transactions = new ArrayList<>();
+    private static ArrayList<SimAccount> accounts = new ArrayList<>();
+    private static ArrayList<SimTransaction> transactions = new ArrayList<>();
     private static Scanner scanner = new Scanner(System.in);
-    private static int accountIdCounter = 1000;
+    static int accountIdCounter = 1000;
 
     public static void main(String[] args) {
         System.out.println("=== Bank Account Simulator ===");
@@ -57,44 +57,47 @@ public class BankAccountSimulator {
     }
 
     private static void displayMenu() {
-        System.out.println("\n=== Bank Account Menu ===");
+        System.out.println("\n=== Banking System Menu ===");
         System.out.println("1. Create New Account");
         System.out.println("2. Deposit Money");
         System.out.println("3. Withdraw Money");
         System.out.println("4. Transfer Money");
         System.out.println("5. View Account Details");
         System.out.println("6. View Transaction History");
-        System.out.println("7. Generate Account Report");
+        System.out.println("7. Generate Report");
         System.out.println("8. Exit");
-        System.out.println("==========================");
+        System.out.println("===========================");
     }
 
     private static void createAccount() {
         System.out.println("\n=== Create New Account ===");
-        System.out.println("Account Types:");
         System.out.println("1. Savings Account");
         System.out.println("2. Checking Account");
+        int typeChoice = getIntInput("Enter account type: ");
 
-        int typeChoice = getIntInput("Select account type: ");
         System.out.print("Enter account holder name: ");
         String name = scanner.nextLine();
-
-        System.out.print("Enter initial deposit amount: ");
+        System.out.print("Enter initial deposit: ");
         double initialDeposit = getDoubleInput("");
 
-        Account account;
+        if (initialDeposit < 0) {
+            System.out.println("Initial deposit cannot be negative.");
+            return;
+        }
+
+        SimAccount account;
         if (typeChoice == 1) {
             System.out.print("Enter interest rate (%): ");
             double interestRate = getDoubleInput("");
-            account = new SavingsAccount(name, initialDeposit, interestRate);
+            account = new SimSavingsAccount(name, initialDeposit, interestRate);
         } else {
-            account = new CheckingAccount(name, initialDeposit);
+            account = new SimCheckingAccount(name, initialDeposit);
         }
 
         accounts.add(account);
 
         // Record initial deposit transaction
-        Transaction transaction = new Transaction(account.getAccountNumber(), "Initial Deposit",
+        SimTransaction transaction = new SimTransaction(account.getAccountNumber(), "Initial Deposit",
                                                 initialDeposit, account.getBalance(), "Deposit");
         transactions.add(transaction);
 
@@ -107,7 +110,7 @@ public class BankAccountSimulator {
         System.out.println("\n=== Deposit Money ===");
         int accountNumber = getIntInput("Enter account number: ");
 
-        Account account = findAccountByNumber(accountNumber);
+        SimAccount account = findAccountByNumber(accountNumber);
         if (account == null) {
             System.out.println("Account not found.");
             return;
@@ -123,7 +126,7 @@ public class BankAccountSimulator {
         account.deposit(amount);
 
         // Record transaction
-        Transaction transaction = new Transaction(accountNumber, "Deposit", amount,
+        SimTransaction transaction = new SimTransaction(accountNumber, "Deposit", amount,
                                                 account.getBalance(), "Deposit");
         transactions.add(transaction);
 
@@ -136,7 +139,7 @@ public class BankAccountSimulator {
         System.out.println("\n=== Withdraw Money ===");
         int accountNumber = getIntInput("Enter account number: ");
 
-        Account account = findAccountByNumber(accountNumber);
+        SimAccount account = findAccountByNumber(accountNumber);
         if (account == null) {
             System.out.println("Account not found.");
             return;
@@ -153,7 +156,7 @@ public class BankAccountSimulator {
 
         if (success) {
             // Record transaction
-            Transaction transaction = new Transaction(accountNumber, "Withdrawal", amount,
+            SimTransaction transaction = new SimTransaction(accountNumber, "Withdrawal", amount,
                                                     account.getBalance(), "Withdrawal");
             transactions.add(transaction);
 
@@ -169,7 +172,7 @@ public class BankAccountSimulator {
         System.out.println("\n=== Transfer Money ===");
         int fromAccountNumber = getIntInput("Enter sender account number: ");
 
-        Account fromAccount = findAccountByNumber(fromAccountNumber);
+        SimAccount fromAccount = findAccountByNumber(fromAccountNumber);
         if (fromAccount == null) {
             System.out.println("Sender account not found.");
             return;
@@ -177,7 +180,7 @@ public class BankAccountSimulator {
 
         int toAccountNumber = getIntInput("Enter receiver account number: ");
 
-        Account toAccount = findAccountByNumber(toAccountNumber);
+        SimAccount toAccount = findAccountByNumber(toAccountNumber);
         if (toAccount == null) {
             System.out.println("Receiver account not found.");
             return;
@@ -199,9 +202,9 @@ public class BankAccountSimulator {
             toAccount.deposit(amount);
 
             // Record transactions
-            Transaction debitTransaction = new Transaction(fromAccountNumber,
+            SimTransaction debitTransaction = new SimTransaction(fromAccountNumber,
                 "Transfer to " + toAccountNumber, amount, fromAccount.getBalance(), "Transfer Out");
-            Transaction creditTransaction = new Transaction(toAccountNumber,
+            SimTransaction creditTransaction = new SimTransaction(toAccountNumber,
                 "Transfer from " + fromAccountNumber, amount, toAccount.getBalance(), "Transfer In");
 
             transactions.add(debitTransaction);
@@ -220,84 +223,76 @@ public class BankAccountSimulator {
         System.out.println("\n=== Account Details ===");
         int accountNumber = getIntInput("Enter account number: ");
 
-        Account account = findAccountByNumber(accountNumber);
+        SimAccount account = findAccountByNumber(accountNumber);
         if (account == null) {
             System.out.println("Account not found.");
             return;
         }
 
         account.displayAccountInfo();
+
+        // Show additional details for savings accounts
+        if (account instanceof SimSavingsAccount) {
+            SimSavingsAccount savings = (SimSavingsAccount) account;
+            System.out.println("Interest Rate: " + savings.getInterestRate() + "%");
+        } else if (account instanceof SimCheckingAccount) {
+            SimCheckingAccount checking = (SimCheckingAccount) account;
+            System.out.println("Overdraft Limit: $" + checking.getOverdraftLimit());
+        }
     }
 
     private static void viewTransactionHistory() {
         System.out.println("\n=== Transaction History ===");
         int accountNumber = getIntInput("Enter account number: ");
 
-        Account account = findAccountByNumber(accountNumber);
-        if (account == null) {
-            System.out.println("Account not found.");
-            return;
-        }
-
-        System.out.println("Transaction History for Account: " + accountNumber);
-        boolean hasTransactions = false;
-
-        for (Transaction transaction : transactions) {
+        ArrayList<SimTransaction> accountTransactions = new ArrayList<>();
+        for (SimTransaction transaction : transactions) {
             if (transaction.getAccountNumber() == accountNumber) {
-                System.out.println(transaction.getTimestamp().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) +
-                                 " | " + transaction.getDescription() + " | $" +
-                                 String.format("%.2f", transaction.getAmount()) + " | Balance: $" +
-                                 String.format("%.2f", transaction.getBalanceAfter()));
-                hasTransactions = true;
+                accountTransactions.add(transaction);
             }
         }
 
-        if (!hasTransactions) {
-            System.out.println("No transactions found for this account.");
+        if (accountTransactions.isEmpty()) {
+            System.out.println("No transactions found.");
+            return;
+        }
+
+        System.out.println("\nTransaction History:");
+        System.out.println("--------------------------------------------");
+        for (int i = accountTransactions.size() - 1; i >= 0; i--) {
+            SimTransaction transaction = accountTransactions.get(i);
+            System.out.println(transaction.getTimestamp().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) +
+                             " | " + transaction.getType() +
+                             " | $" + String.format("%.2f", transaction.getAmount()) +
+                             " | Balance: $" + String.format("%.2f", transaction.getBalanceAfter()));
         }
     }
 
     private static void generateAccountReport() {
         System.out.println("\n=== Account Report ===");
-        if (accounts.isEmpty()) {
-            System.out.println("No accounts found.");
-            return;
-        }
+        System.out.println("Total Accounts: " + accounts.size());
+        System.out.println("Total Transactions: " + transactions.size());
 
         double totalBalance = 0;
         int savingsCount = 0;
         int checkingCount = 0;
 
-        System.out.println("Individual Account Summary:");
-        System.out.println("----------------------------");
-
-        for (Account account : accounts) {
-            System.out.println("Account: " + account.getAccountNumber() + " (" + account.getAccountType() + ")");
-            System.out.println("Holder: " + account.getAccountHolder());
-            System.out.println("Balance: $" + String.format("%.2f", account.getBalance()));
-
-            if (account instanceof SavingsAccount) {
-                SavingsAccount savings = (SavingsAccount) account;
-                System.out.println("Interest Rate: " + savings.getInterestRate() + "%");
+        for (SimAccount account : accounts) {
+            totalBalance += account.getBalance();
+            if (account instanceof SimSavingsAccount) {
                 savingsCount++;
-            } else if (account instanceof CheckingAccount) {
+            } else if (account instanceof SimCheckingAccount) {
                 checkingCount++;
             }
-
-            totalBalance += account.getBalance();
-            System.out.println();
         }
 
-        System.out.println("Bank Summary:");
-        System.out.println("Total Accounts: " + accounts.size());
         System.out.println("Savings Accounts: " + savingsCount);
         System.out.println("Checking Accounts: " + checkingCount);
-        System.out.println("Total Bank Balance: $" + String.format("%.2f", totalBalance));
-        System.out.println("Average Account Balance: $" + String.format("%.2f", totalBalance / accounts.size()));
+        System.out.println("Total Balance: $" + String.format("%.2f", totalBalance));
     }
 
-    private static Account findAccountByNumber(int accountNumber) {
-        for (Account account : accounts) {
+    private static SimAccount findAccountByNumber(int accountNumber) {
+        for (SimAccount account : accounts) {
             if (account.getAccountNumber() == accountNumber) {
                 return account;
             }
@@ -305,100 +300,95 @@ public class BankAccountSimulator {
         return null;
     }
 
-    private static void saveDataToFiles() {
-        // Save accounts
-        try (PrintWriter writer = new PrintWriter(new FileWriter("accounts.txt"))) {
-            for (Account account : accounts) {
-                String accountType = account instanceof SavingsAccount ? "SAVINGS" : "CHECKING";
-                writer.println(account.getAccountNumber() + "," + account.getAccountHolder() + "," +
-                             account.getBalance() + "," + accountType);
-
-                if (account instanceof SavingsAccount) {
-                    SavingsAccount savings = (SavingsAccount) account;
-                    writer.println("INTEREST_RATE," + savings.getInterestRate());
-                }
-            }
-        } catch (IOException e) {
-            System.out.println("Error saving accounts: " + e.getMessage());
-        }
-
-        // Save transactions
-        try (PrintWriter writer = new PrintWriter(new FileWriter("transactions.txt"))) {
-            for (Transaction transaction : transactions) {
-                writer.println(transaction.getAccountNumber() + "," + transaction.getDescription() + "," +
-                             transaction.getAmount() + "," + transaction.getBalanceAfter() + "," +
-                             transaction.getType() + "," + transaction.getTimestamp());
-            }
-        } catch (IOException e) {
-            System.out.println("Error saving transactions: " + e.getMessage());
-        }
-
-        System.out.println("Data saved successfully!");
-    }
-
     private static void loadDataFromFiles() {
-        // Load accounts
-        try (BufferedReader reader = new BufferedReader(new FileReader("accounts.txt"))) {
-            String line;
-            Account currentAccount = null;
+        File accountsFile = new File("bank_accounts_sim.txt");
+        if (accountsFile.exists()) {
+            try (BufferedReader reader = new BufferedReader(new FileReader(accountsFile))) {
+                String line;
+                reader.readLine(); // Skip header
+                while ((line = reader.readLine()) != null) {
+                    String[] parts = line.split(",");
+                    if (parts.length >= 4) {
+                        int accountNumber = Integer.parseInt(parts[0]);
+                        String holder = parts[1];
+                        double balance = Double.parseDouble(parts[2]);
+                        String type = parts[3];
 
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
-                if (parts.length >= 4 && !parts[0].equals("INTEREST_RATE")) {
-                    int accountNumber = Integer.parseInt(parts[0]);
-                    String holder = parts[1];
-                    double balance = Double.parseDouble(parts[2]);
-                    String accountType = parts[3];
-
-                    if (accountType.equals("SAVINGS")) {
-                        // Read next line for interest rate
-                        String interestLine = reader.readLine();
-                        if (interestLine != null && interestLine.startsWith("INTEREST_RATE,")) {
-                            double interestRate = Double.parseDouble(interestLine.split(",")[1]);
-                            currentAccount = new SavingsAccount(holder, balance, interestRate);
+                        SimAccount account;
+                        if (type.equals("Savings")) {
+                            double rate = Double.parseDouble(parts[4]);
+                            account = new SimSavingsAccount(holder, balance, rate);
+                        } else {
+                            account = new SimCheckingAccount(holder, balance);
                         }
-                    } else {
-                        currentAccount = new CheckingAccount(holder, balance);
-                    }
-
-                    if (currentAccount != null) {
-                        currentAccount.setAccountNumber(accountNumber);
-                        accounts.add(currentAccount);
+                        account.setAccountNumber(accountNumber);
+                        accounts.add(account);
 
                         if (accountNumber >= accountIdCounter) {
                             accountIdCounter = accountNumber + 1;
                         }
                     }
                 }
+            } catch (IOException e) {
+                System.out.println("Error loading accounts: " + e.getMessage());
             }
-        } catch (FileNotFoundException e) {
-            // File doesn't exist, start with empty list
-        } catch (IOException e) {
-            System.out.println("Error loading accounts: " + e.getMessage());
         }
 
-        // Load transactions
-        try (BufferedReader reader = new BufferedReader(new FileReader("transactions.txt"))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
-                if (parts.length >= 6) {
-                    int accountNumber = Integer.parseInt(parts[0]);
-                    String description = parts[1];
-                    double amount = Double.parseDouble(parts[2]);
-                    double balanceAfter = Double.parseDouble(parts[3]);
-                    String type = parts[4];
-                    LocalDateTime timestamp = LocalDateTime.parse(parts[5]);
+        File transactionsFile = new File("bank_transactions_sim.txt");
+        if (transactionsFile.exists()) {
+            try (BufferedReader reader = new BufferedReader(new FileReader(transactionsFile))) {
+                String line;
+                reader.readLine(); // Skip header
+                while ((line = reader.readLine()) != null) {
+                    String[] parts = line.split(",");
+                    if (parts.length >= 6) {
+                        int accountNumber = Integer.parseInt(parts[0]);
+                        String description = parts[1];
+                        double amount = Double.parseDouble(parts[2]);
+                        double balanceAfter = Double.parseDouble(parts[3]);
+                        String type = parts[4];
+                        LocalDateTime timestamp = LocalDateTime.parse(parts[5]);
 
-                    Transaction transaction = new Transaction(accountNumber, description, amount, balanceAfter, type);
-                    transaction.setTimestamp(timestamp);
-                    transactions.add(transaction);
+                        SimTransaction transaction = new SimTransaction(accountNumber, description, amount, balanceAfter, type);
+                        transaction.setTimestamp(timestamp);
+                        transactions.add(transaction);
+                    }
                 }
+            } catch (IOException e) {
+                System.out.println("Error loading transactions: " + e.getMessage());
             }
-        } catch (FileNotFoundException e) {
-            // File doesn't exist, start with empty list
+        }
+    }
+
+    private static void saveDataToFiles() {
+        try (PrintWriter writer = new PrintWriter(new FileOutputStream("bank_accounts_sim.txt"))) {
+            writer.println("AccountNumber,Holder,Balance,Type,Rate");
+            for (SimAccount account : accounts) {
+                writer.print(account.getAccountNumber() + ",");
+                writer.print(account.getAccountHolder() + ",");
+                writer.print(account.getBalance() + ",");
+                writer.print(account.getAccountType());
+                if (account instanceof SimSavingsAccount) {
+                    writer.print("," + ((SimSavingsAccount) account).getInterestRate());
+                }
+                writer.println();
+            }
         } catch (IOException e) {
-            System.out.println("Error loading transactions: " + e.getMessage());
+            System.out.println("Error saving accounts: " + e.getMessage());
+        }
+
+        try (PrintWriter writer = new PrintWriter(new FileOutputStream("bank_transactions_sim.txt"))) {
+            writer.println("AccountNumber,Description,Amount,BalanceAfter,Type,Timestamp");
+            for (SimTransaction transaction : transactions) {
+                writer.println(transaction.getAccountNumber() + "," +
+                             transaction.getDescription() + "," +
+                             transaction.getAmount() + "," +
+                             transaction.getBalanceAfter() + "," +
+                             transaction.getType() + "," +
+                             transaction.getTimestamp().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+            }
+        } catch (IOException e) {
+            System.out.println("Error saving transactions: " + e.getMessage());
         }
     }
 
@@ -406,10 +396,9 @@ public class BankAccountSimulator {
         while (true) {
             try {
                 System.out.print(prompt);
-                int value = Integer.parseInt(scanner.nextLine());
-                return value;
+                return Integer.parseInt(scanner.nextLine());
             } catch (NumberFormatException e) {
-                System.out.println("Please enter a valid integer.");
+                System.out.println("Please enter a valid number.");
             }
         }
     }
@@ -418,8 +407,7 @@ public class BankAccountSimulator {
         while (true) {
             try {
                 System.out.print(prompt);
-                double value = Double.parseDouble(scanner.nextLine());
-                return value;
+                return Double.parseDouble(scanner.nextLine());
             } catch (NumberFormatException e) {
                 System.out.println("Please enter a valid number.");
             }
@@ -427,13 +415,13 @@ public class BankAccountSimulator {
     }
 }
 
-// Abstract Account class demonstrating inheritance and abstraction
-abstract class Account {
+// Abstract SimAccount class demonstrating inheritance and abstraction
+abstract class SimAccount {
     protected int accountNumber;
     protected String accountHolder;
     protected double balance;
 
-    public Account(String accountHolder, double initialBalance) {
+    public SimAccount(String accountHolder, double initialBalance) {
         this.accountNumber = BankAccountSimulator.accountIdCounter++;
         this.accountHolder = accountHolder;
         this.balance = initialBalance;
@@ -460,11 +448,11 @@ abstract class Account {
     public double getBalance() { return balance; }
 }
 
-// Savings Account class demonstrating inheritance
-class SavingsAccount extends Account {
+// SimSavingsAccount class demonstrating inheritance
+class SimSavingsAccount extends SimAccount {
     private double interestRate;
 
-    public SavingsAccount(String accountHolder, double initialBalance, double interestRate) {
+    public SimSavingsAccount(String accountHolder, double initialBalance, double interestRate) {
         super(accountHolder, initialBalance);
         this.interestRate = interestRate;
     }
@@ -488,16 +476,16 @@ class SavingsAccount extends Account {
     }
 
     public void applyInterest() {
-        double interest = balance * (interestRate / 100) / 12; // Monthly interest
+        double interest = balance * (interestRate / 100) / 12;
         balance += interest;
     }
 }
 
-// Checking Account class demonstrating inheritance
-class CheckingAccount extends Account {
+// SimCheckingAccount class demonstrating inheritance
+class SimCheckingAccount extends SimAccount {
     private static final double OVERDRAFT_LIMIT = 500.0;
 
-    public CheckingAccount(String accountHolder, double initialBalance) {
+    public SimCheckingAccount(String accountHolder, double initialBalance) {
         super(accountHolder, initialBalance);
     }
 
@@ -520,8 +508,8 @@ class CheckingAccount extends Account {
     }
 }
 
-// Transaction class for recording account activities
-class Transaction {
+// SimTransaction class for recording account activities
+class SimTransaction {
     private int accountNumber;
     private String description;
     private double amount;
@@ -529,7 +517,7 @@ class Transaction {
     private String type;
     private LocalDateTime timestamp;
 
-    public Transaction(int accountNumber, String description, double amount, double balanceAfter, String type) {
+    public SimTransaction(int accountNumber, String description, double amount, double balanceAfter, String type) {
         this.accountNumber = accountNumber;
         this.description = description;
         this.amount = amount;
