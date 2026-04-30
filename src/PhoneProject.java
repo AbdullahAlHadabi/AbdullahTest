@@ -85,7 +85,8 @@ public class PhoneProject {
             }
         }
     }
- class Contact {
+
+class Contact {
     String name;
     String number;
     public Contact(String name, String number) {
@@ -93,5 +94,3 @@ public class PhoneProject {
         this.number = number;
     }
 }
-
-
